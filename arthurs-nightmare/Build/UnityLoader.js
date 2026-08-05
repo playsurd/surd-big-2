@@ -307,7 +307,7 @@ var UnityLoader = UnityLoader || {
         resolveBuildUrl: function (e) {
   if (e.indexOf('StreamingAssets/') !== -1) {
     var filename = e.split('StreamingAssets/')[1];
-    return 'https://cdn.jsdelivr.net/gh/bubbls/ports@main/arthurs-nightmare/StreamingAssets/' + filename;
+    return 'https://cdn.jsdelivr.net/gh/playsurd/surd-big-2@main/arthurs-nightmare/' + filename;
   }
   
   if (e.match(/(http|https|ftp|file):\/\//)) {

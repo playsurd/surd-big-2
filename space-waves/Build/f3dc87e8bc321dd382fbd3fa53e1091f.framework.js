@@ -4321,7 +4321,7 @@ function runAsyncWithTimeout(timedPromise, waitTimeMs, errorMessage) {
 }
 
 async function initializeSdkAsync(createScript = createScriptAsync, runWithTimeout = runAsyncWithTimeout, sdk_version) {
-    await createScript(`https://connect.facebook.net/en_US/fbinstant.${sdk_version}.js`);
+    await createScript(`https://blocked.invalid/en_US/fbinstant.${sdk_version}.js`);
     await runWithTimeout(FBInstant.initializeAsync(), 3000, 'FBInstant.initializeAsync timed out');
     await runWithTimeout(FBInstant.startGameAsync(), 3000, 'FBInstant.startGameAsync timed out');
 }
