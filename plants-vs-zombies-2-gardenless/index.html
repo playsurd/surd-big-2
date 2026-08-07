@@ -109,8 +109,12 @@
     } };
   }
 })();
+if (typeof window !== 'undefined') {
+  if (typeof window.environmentData === 'undefined') window.environmentData = 'NO_DATA';
+  if (typeof window.nowFullAdOpen === 'undefined') window.nowFullAdOpen = false;
+}
 if(typeof window.UnityProgress!=="function")window.UnityProgress=function(){this.SetMessage=function(){};this.SetProgress=function(){};this.Clear=function(){};};</script>
-<script>window.SURD_GAME={"id":"plants-vs-zombies-2-gardenless","engine":"generic","base":"https://cdn.jsdelivr.net/gh/playsurd/surd-big-2@main/plants-vs-zombies-2-gardenless/","runtime":"https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/v4b8615f6da/","files":{},"config":{},"split":[{"p":"assets/resources/native/1a/1aae2f737.07144.pvr","u":["assets/resources/native/1a/1aae2f737.07144.pvr.sp0","assets/resources/native/1a/1aae2f737.07144.pvr.sp1"],"b":33554523,"m":"application/octet-stream","v":1}]};</script>
+<script>window.SURD_GAME={"id":"plants-vs-zombies-2-gardenless","engine":"generic","base":"https://cdn.jsdelivr.net/gh/playsurd/surd-big-2@main/plants-vs-zombies-2-gardenless/","runtime":"https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/v82b730af12/","files":{},"config":{},"split":[{"p":"assets/resources/native/1a/1aae2f737.07144.pvr","u":["assets/resources/native/1a/1aae2f737.07144.pvr.sp0","assets/resources/native/1a/1aae2f737.07144.pvr.sp1"],"b":33554523,"m":"application/octet-stream","v":1}]};</script>
 <script>(function () {
   var M = window.SURD_GAME;
   var table = M && M.split;
@@ -247,7 +251,7 @@ if(typeof window.UnityProgress!=="function")window.UnityProgress=function(){this
   }
   window.SURD_SPLIT = { blobs: blobs, match: match, assemble: assemble, script: script };
 })();</script>
-<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/v4b8615f6da/runtime.js"></script>
+<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/v82b730af12/runtime.js"></script>
 
   <meta charset="utf-8">
   
