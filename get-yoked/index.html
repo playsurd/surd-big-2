@@ -24,6 +24,7 @@
     W.PokiSDK = {
       init: resolved, initPokiBridge: function () {}, setDebug: function () {},
       gameLoadingStart: function () {}, gameLoadingFinished: function () {},
+      gameLoadingProgress: function () {},
       gameplayStart: function () {}, gameplayStop: function () {},
       commercialBreak: resolved, rewardedBreak: function () { return Promise.resolve(false); },
       happyTime: function () {}, customEvent: function () {}, captureError: function () {},
@@ -87,6 +88,9 @@
       ads: { requestInterstitialAd: function () { return Promise.resolve(); } },
     };
   }
+  if (typeof document !== 'undefined' && document.xURL === undefined) {
+    try { document.xURL = 'https://poki.com/'; } catch (e) {  }
+  }
   if (!W.GamePix) {
     W.GamePix = { init: function () {}, ping: function () {}, gameLoadingStart: function () {}, gameLoadingFinished: function () {},
                   interstitialAd: resolved, rewardAd: function () { return Promise.resolve(false); }, happyMoment: function () {} };
@@ -101,8 +105,9 @@
     } };
   }
 })();
-if(typeof window.UnityProgress!=="function")window.UnityProgress=function(){};</script></head><body>
+if(typeof window.UnityProgress!=="function")window.UnityProgress=function(){this.SetMessage=function(){};this.SetProgress=function(){};this.Clear=function(){};};</script></head><body>
 <div id="unity-container" class="unity-desktop" style="position:absolute;inset:0"><canvas id="unity-canvas" style="width:100vw;height:100vh;display:block"></canvas><div id="loading-cover" style="display:none"></div><div id="unity-loading-bar" style="display:none"><div id="unity-logo"></div><div id="unity-progress-bar-empty"><div id="unity-progress-bar-full"></div></div></div><div id="unity-footer"><div id="unity-webgl-logo"></div><div id="unity-fullscreen-button"></div><div id="unity-build-title"></div></div></div>
+
 <script>
 
     function formatSize(bytes) {
@@ -131,7 +136,6 @@ if(typeof window.UnityProgress!=="function")window.UnityProgress=function(){};</
           container.style.top = Math.floor((window.innerHeight - h) / 2) + "px";
           container.style.left = Math.floor((window.innerWidth - w) / 2) + "px";
         }</script>
-
-<script>window.SURD_GAME = {"id":"get-yoked","engine":"unity","base":"https://cdn.jsdelivr.net/gh/playsurd/surd-big-2@main/get-yoked/","runtime":"https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/vac4f82b81e/","files":{"data":{"path":"Build/Web.data","parts":[".sp0",".sp1"],"bytes":32882747,"mime":"application/octet-stream"},"framework":{"path":"Build/Web.framework.js","bytes":446070},"code":{"path":"Build/Web.wasm","parts":[".sp0",".sp1",".sp2"],"bytes":51861723,"mime":"application/wasm"}},"config":{"era":"modern","loaderJs":"Build/Web.loader.js","companyName":",\n          productName: ","productName":",\n          productVersion: ","productVersion":"\n        };\n\n        createUnityInstance(canvas, config, (progress) => {\n          const percent = Math.round(progress * 100);\n          loadingText.textContent = `LOADING... ${percent}%`;\n        }).then((unityInstance) => {\n          loadingText.remove();\n        }).catch((message) => {\n          loadingText.textContent = "}};</script>
-<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/vac4f82b81e/runtime.js"></script>
+<script>window.SURD_GAME = {"id":"get-yoked","engine":"unity","base":"https://cdn.jsdelivr.net/gh/playsurd/surd-big-2@main/get-yoked/","runtime":"https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/v4b8615f6da/","files":{"data":{"path":"Build/Web.data","parts":[".sp0",".sp1"],"bytes":32882747,"mime":"application/octet-stream"},"framework":{"path":"Build/Web.framework.js","bytes":446070,"mime":"text/javascript"},"code":{"path":"Build/Web.wasm","parts":[".sp0",".sp1",".sp2"],"bytes":51861723,"mime":"application/wasm"}},"config":{"era":"modern","loaderJs":"Build/Web.loader.js","companyName":",\n          productName: ","productName":",\n          productVersion: ","productVersion":"\n        };\n\n        createUnityInstance(canvas, config, (progress) => {\n          const percent = Math.round(progress * 100);\n          loadingText.textContent = `LOADING... ${percent}%`;\n        }).then((unityInstance) => {\n          loadingText.remove();\n        }).catch((message) => {\n          loadingText.textContent = "}};</script>
+<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/v4b8615f6da/runtime.js"></script>
 </body></html>

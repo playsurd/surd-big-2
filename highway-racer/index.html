@@ -24,6 +24,7 @@
     W.PokiSDK = {
       init: resolved, initPokiBridge: function () {}, setDebug: function () {},
       gameLoadingStart: function () {}, gameLoadingFinished: function () {},
+      gameLoadingProgress: function () {},
       gameplayStart: function () {}, gameplayStop: function () {},
       commercialBreak: resolved, rewardedBreak: function () { return Promise.resolve(false); },
       happyTime: function () {}, customEvent: function () {}, captureError: function () {},
@@ -87,6 +88,9 @@
       ads: { requestInterstitialAd: function () { return Promise.resolve(); } },
     };
   }
+  if (typeof document !== 'undefined' && document.xURL === undefined) {
+    try { document.xURL = 'https://poki.com/'; } catch (e) {  }
+  }
   if (!W.GamePix) {
     W.GamePix = { init: function () {}, ping: function () {}, gameLoadingStart: function () {}, gameLoadingFinished: function () {},
                   interstitialAd: resolved, rewardAd: function () { return Promise.resolve(false); }, happyMoment: function () {} };
@@ -101,8 +105,9 @@
     } };
   }
 })();
-if(typeof window.UnityProgress!=="function")window.UnityProgress=function(){};</script></head><body>
+if(typeof window.UnityProgress!=="function")window.UnityProgress=function(){this.SetMessage=function(){};this.SetProgress=function(){};this.Clear=function(){};};</script></head><body>
 <div id="unity-container" class="unity-desktop" style="position:absolute;inset:0"><canvas id="unity-canvas" style="width:100vw;height:100vh;display:block"></canvas><div id="loading-cover" style="display:none"></div><div id="unity-loading-bar" style="display:none"><div id="unity-logo"></div><div id="unity-progress-bar-empty"><div id="unity-progress-bar-full"></div></div></div><div id="unity-footer"><div id="unity-webgl-logo"></div><div id="unity-fullscreen-button"></div><div id="unity-build-title"></div></div></div>
+
 <script>
     const SPLIT_MAP = {"ff9dea288687234e8613ffdc18a1806f.wasm": null, "a58f65d7e321afe555338f8f736ca3fc.data": null};
     </script>
@@ -117,7 +122,6 @@ if(typeof window.UnityProgress!=="function")window.UnityProgress=function(){};</
     window.addEventListener("load", resizeCanvas);
     window.addEventListener("resize", resizeCanvas);
     </script>
-
-<script>window.SURD_GAME = {"id":"highway-racer","engine":"unity","base":"https://cdn.jsdelivr.net/gh/playsurd/surd-big-2@main/highway-racer/","runtime":"https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/vac4f82b81e/","files":{"data":{"path":"Build/a58f65d7e321afe555338f8f736ca3fc.data","parts":[".sp0",".sp1",".sp2",".sp3"],"bytes":65576849,"mime":"application/octet-stream"},"framework":{"path":"Build/d29c452f6e3c527bff86fb76dc52dea4.js","bytes":633770},"code":{"path":"Build/ff9dea288687234e8613ffdc18a1806f.wasm","parts":[".sp0",".sp1"],"bytes":23023401,"mime":"application/wasm"}},"config":{"era":"modern","loaderJs":"Build/highway_racer.loader.js","companyName":"Highway Racer","productName":"Highway Racer","productVersion":"1.0.0"}};</script>
-<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/vac4f82b81e/runtime.js"></script>
+<script>window.SURD_GAME = {"id":"highway-racer","engine":"unity","base":"https://cdn.jsdelivr.net/gh/playsurd/surd-big-2@main/highway-racer/","runtime":"https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/v4b8615f6da/","files":{"data":{"path":"Build/a58f65d7e321afe555338f8f736ca3fc.data","parts":[".sp0",".sp1",".sp2",".sp3"],"bytes":65576849,"mime":"application/octet-stream"},"framework":{"path":"Build/d29c452f6e3c527bff86fb76dc52dea4.js","bytes":633770,"mime":"text/javascript"},"code":{"path":"Build/ff9dea288687234e8613ffdc18a1806f.wasm","parts":[".sp0",".sp1"],"bytes":23023401,"mime":"application/wasm"}},"config":{"era":"modern","loaderJs":"Build/highway_racer.loader.js","companyName":"Highway Racer","productName":"Highway Racer","productVersion":"1.0.0"}};</script>
+<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/v4b8615f6da/runtime.js"></script>
 </body></html>
