@@ -24,6 +24,7 @@
     W.PokiSDK = {
       init: resolved, initPokiBridge: function () {}, setDebug: function () {},
       gameLoadingStart: function () {}, gameLoadingFinished: function () {},
+      gameLoadingProgress: function () {},
       gameplayStart: function () {}, gameplayStop: function () {},
       commercialBreak: resolved, rewardedBreak: function () { return Promise.resolve(false); },
       happyTime: function () {}, customEvent: function () {}, captureError: function () {},
@@ -87,6 +88,9 @@
       ads: { requestInterstitialAd: function () { return Promise.resolve(); } },
     };
   }
+  if (typeof document !== 'undefined' && document.xURL === undefined) {
+    try { document.xURL = 'https://poki.com/'; } catch (e) {  }
+  }
   if (!W.GamePix) {
     W.GamePix = { init: function () {}, ping: function () {}, gameLoadingStart: function () {}, gameLoadingFinished: function () {},
                   interstitialAd: resolved, rewardAd: function () { return Promise.resolve(false); }, happyMoment: function () {} };
@@ -101,12 +105,12 @@
     } };
   }
 })();
-if(typeof window.UnityProgress!=="function")window.UnityProgress=function(){};</script></head><body>
+if(typeof window.UnityProgress!=="function")window.UnityProgress=function(){this.SetMessage=function(){};this.SetProgress=function(){};this.Clear=function(){};};</script></head><body>
 <div id="unity-container" class="unity-desktop" style="position:absolute;inset:0"><canvas id="unity-canvas" style="width:100vw;height:100vh;display:block"></canvas><div id="loading-cover" style="display:none"></div><div id="unity-loading-bar" style="display:none"><div id="unity-logo"></div><div id="unity-progress-bar-empty"><div id="unity-progress-bar-full"></div></div></div><div id="unity-footer"><div id="unity-webgl-logo"></div><div id="unity-fullscreen-button"></div><div id="unity-build-title"></div></div></div>
+
 <script>
       function unityShowBanner(msg, type) {
       }</script>
-
-<script>window.SURD_GAME = {"id":"shredsauce","engine":"unity","base":"https://cdn.jsdelivr.net/gh/playsurd/surd-big-2@main/shredsauce/","runtime":"https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/vac4f82b81e/","files":{"data":{"path":"Build/b8baf304ab63b27d543288e594c9716f.data.gz","parts":[".sp0",".sp1"],"bytes":33730253,"mime":"application/octet-stream"},"framework":{"path":"Build/framework.js","bytes":461310},"code":{"path":"Build/150f9aa8e74e09da531ebfc4750c7402.wasm.gz","parts":[".sp0",".sp1",".sp2"],"bytes":46390117,"mime":"application/octet-stream"}},"config":{"era":"modern","loaderJs":"Build/9edd899bc6b6e0bbc4f46ff33ca0bba6.loader.js","companyName":"Shredsauce","productName":"Shredsauce","productVersion":"1.0"}};</script>
-<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/vac4f82b81e/runtime.js"></script>
+<script>window.SURD_GAME = {"id":"shredsauce","engine":"unity","base":"https://cdn.jsdelivr.net/gh/playsurd/surd-big-2@main/shredsauce/","runtime":"https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/v4b8615f6da/","files":{"data":{"path":"Build/b8baf304ab63b27d543288e594c9716f.data.gz","parts":[".sp0",".sp1"],"bytes":33730253,"mime":"application/octet-stream"},"framework":{"path":"Build/framework.js","bytes":461310,"mime":"text/javascript"},"code":{"path":"Build/150f9aa8e74e09da531ebfc4750c7402.wasm.gz","parts":[".sp0",".sp1",".sp2"],"bytes":46390117,"mime":"application/wasm"}},"config":{"era":"modern","loaderJs":"Build/9edd899bc6b6e0bbc4f46ff33ca0bba6.loader.js","companyName":"Shredsauce","productName":"Shredsauce","productVersion":"1.0"}};</script>
+<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/v4b8615f6da/runtime.js"></script>
 </body></html>
