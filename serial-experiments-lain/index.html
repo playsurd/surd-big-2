@@ -1,0 +1,266 @@
+
+<html lang="en">
+  
+    <head>
+<base href="https://cdn.jsdelivr.net/gh/playsurd/surd-assets@main/serial-experiments-lain/">
+<script>(function () {
+  var W = window;
+  var unityTarget = null;
+  function tellUnity(methods, arg) {
+    var inst = W.__surdUnity || W.unityInstance || W.gameInstance;
+    if (!inst || !inst.SendMessage || !unityTarget) return;
+    for (var i = 0; i < methods.length; i++) {
+      try { arg === undefined ? inst.SendMessage(unityTarget, methods[i]) : inst.SendMessage(unityTarget, methods[i], arg); }
+      catch (e) {  }
+    }
+  }
+  if (typeof W.initPokiBridge !== 'function') {
+    W.initPokiBridge = function (name) { unityTarget = name || unityTarget; };
+  }
+  if (typeof W.commercialBreak !== 'function') {
+    W.commercialBreak = function () { setTimeout(function () { tellUnity(['CommercialBreakComplete', 'commercialBreakComplete']); }, 0); };
+  }
+  if (typeof W.rewardedBreak !== 'function') {
+    W.rewardedBreak = function () { setTimeout(function () { tellUnity(['RewardedBreakComplete', 'rewardedBreakComplete'], 'false'); }, 0); };
+  }
+  var resolved = function () { return Promise.resolve(); };
+  if (!W.PokiSDK) {
+    W.PokiSDK = {
+      init: resolved, initPokiBridge: function () {}, setDebug: function () {},
+      gameLoadingStart: function () {}, gameLoadingFinished: function () {},
+      gameLoadingProgress: function () {},
+      gameplayStart: function () {}, gameplayStop: function () {},
+      commercialBreak: resolved, rewardedBreak: function () { return Promise.resolve(false); },
+      happyTime: function () {}, customEvent: function () {}, captureError: function () {},
+      isAdBlocked: function () { return false; }, shareableURL: function () { return Promise.resolve(location.href); },
+      getURLParam: function (k) { try { return new URL(location.href).searchParams.get(k) || ''; } catch (e) { return ''; } },
+    };
+  }
+  if (!W.YaGames) {
+    var yPlayer = {
+      getName: function () { return 'player'; }, getUniqueID: function () { return 'local'; },
+      getData: function () { return Promise.resolve({}); }, setData: resolved,
+      getStats: function () { return Promise.resolve({}); }, setStats: resolved, incrementStats: resolved,
+      getMode: function () { return 'lite'; }, getPhoto: function () { return ''; },
+    };
+    var yLeaderboards = {
+      setLeaderboardScore: resolved,
+      getLeaderboardEntries: function () { return Promise.resolve({ entries: [] }); },
+      getLeaderboardPlayerEntry: function () { return Promise.reject(new Error('no entry')); },
+      getLeaderboardDescription: function () { return Promise.resolve({}); },
+    };
+    var ySdk = {
+      adv: {
+        showFullscreenAdv: function (o) { var c = o && o.callbacks; if (c && c.onClose) setTimeout(function () { c.onClose(false); }, 0); },
+        showRewardedVideo: function (o) { var c = o && o.callbacks; if (c && c.onClose) setTimeout(function () { c.onClose(); }, 0); },
+        getBannerAdvStatus: function () { return Promise.resolve({ stickyAdvIsShowing: false }); },
+      },
+      getPlayer: function () { return Promise.resolve(yPlayer); },
+      getPayments: function () { return Promise.resolve({
+        getCatalog: function () { return Promise.resolve([]); },
+        getPurchases: function () { return Promise.resolve([]); },
+        purchase: function () { return Promise.reject(new Error('payments unavailable')); },
+        consumePurchase: resolved,
+      }); },
+      getFlags: function () { return Promise.resolve({}); },
+      getStorage: function () { return Promise.resolve(window.localStorage); },
+      clipboard: { writeText: resolved },
+      shortcut: { canShowPrompt: function () { return Promise.resolve({ canShow: false }); }, showPrompt: function () { return Promise.resolve({ outcome: 'rejected' }); } },
+      feedback: { canReview: function () { return Promise.resolve({ value: false }); }, requestReview: function () { return Promise.resolve({ feedbackSent: false }); } },
+      getLeaderboards: function () { return Promise.resolve(yLeaderboards); },
+      features: { LoadingAPI: { ready: function () {} } },
+      screen: { fullscreen: { request: resolved, exit: resolved } },
+      isAvailableMethod: function () { return Promise.resolve(false); },
+      environment: { i18n: { lang: 'en' }, app: { id: 'local' } },
+      deviceInfo: { isDesktop: function () { return true; }, isMobile: function () { return false; },
+                    isTablet: function () { return false; }, isTV: function () { return false; },
+                    type: 'desktop' },
+    };
+    W.YaGames = { init: function () { return Promise.resolve(ySdk); } };
+    W.ysdk = ySdk;
+  }
+  if (!W.ytgame) {
+    var ytNoop = function () {};
+    W.ytgame = {
+      IN_PLAYABLES_ENV: false,
+      game: { firstFrameReady: ytNoop, gameReady: ytNoop, loadData: function () { return Promise.resolve(''); },
+              saveData: function () { return Promise.resolve(); }, isPaused: function () { return false; } },
+      system: { getLanguage: function () { return 'en'; }, isAudioEnabled: function () { return true; },
+                onAudioEnabledChange: ytNoop, onPause: ytNoop, onResume: ytNoop },
+      health: { logError: ytNoop, logWarning: ytNoop },
+      engagement: { sendScore: function () { return Promise.resolve(); } },
+      ads: { requestInterstitialAd: function () { return Promise.resolve(); } },
+    };
+  }
+  if (typeof document !== 'undefined' && document.xURL === undefined) {
+    try { document.xURL = 'https://poki.com/'; } catch (e) {  }
+  }
+  if (!W.GamePix) {
+    W.GamePix = { init: function () {}, ping: function () {}, gameLoadingStart: function () {}, gameLoadingFinished: function () {},
+                  interstitialAd: resolved, rewardAd: function () { return Promise.resolve(false); }, happyMoment: function () {} };
+  }
+  if (!W.CrazyGames) {
+    var noop = function () {};
+    W.CrazyGames = { SDK: {
+      init: resolved, game: { gameplayStart: noop, gameplayStop: noop, loadingStart: noop, loadingStop: noop, happytime: noop },
+      ad: { requestAd: function (t, cb) { if (cb && cb.adFinished) cb.adFinished(); }, hasAdblock: function () { return Promise.resolve(false); } },
+      user: { getUser: function () { return Promise.resolve(null); } },
+      banner: { requestBanner: resolved, clearAllBanners: noop },
+    } };
+  }
+})();
+if (typeof window !== 'undefined') {
+  if (typeof window.environmentData === 'undefined') window.environmentData = 'NO_DATA';
+  if (typeof window.nowFullAdOpen === 'undefined') window.nowFullAdOpen = false;
+}
+try {
+  var parentWin = window.parent;
+  if (parentWin && parentWin !== window) {
+    if (typeof parentWin.maeExportApis_ !== 'function') parentWin.maeExportApis_ = function () {};
+  }
+} catch (e) {  }
+if(typeof window.UnityProgress!=="function")window.UnityProgress=function(){this.SetMessage=function(){};this.SetProgress=function(){};this.Clear=function(){};};</script>
+<script>window.SURD_GAME={"id":"serial-experiments-lain","engine":"generic","base":"https://cdn.jsdelivr.net/gh/playsurd/surd-assets@main/serial-experiments-lain/","runtime":"https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/v73b6add486/","files":{},"config":{}};</script>
+<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/v73b6add486/runtime.js"></script>
+
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="icon" type="image/png" href="images/icon.png" />
+        <style>
+            .header {
+                border-bottom: none;
+                z-index: -1;
+            }
+
+            .nav-links {
+                display: none;
+            }
+        </style> 
+        <title>< game ></title> 
+      <script type="module" crossorigin src="assets/game4.js"></script>
+      <link rel="stylesheet" crossorigin href="assets/style-D1TkbFgT.css">
+    </head>
+    <body>
+        <div class="header" id="header-bar">
+            <div class="nav-links" id="nav-links-container"> 
+                <a href="/" class="header-link">main</a> 
+                <a href="notes.html" class="header-link">notes</a>
+                <a href="game.html" class="header-link">start</a>
+                <button class="header-link" id="settings-button">options</button>
+                <a href="guide.html" class="header-link">guide</a>
+            </div>
+
+            <div class="button-container">
+                <button id="dropdown-button">
+                    <img src="images/down.svg" class="button-icon" />
+                </button>
+                <button id="console-button">
+                    <img src="images/console.svg" class="button-icon" />
+                    <span class="badge" id="console-badge" style="display: none">0</span>
+                </button>
+            </div>
+        </div>
+        <div id="app">
+            <div id="game-container">
+                <div id="loading">Loading...</div>
+                <video id="media" disablePictureInPicture>
+                    <track id="track" kind="subtitles" default />
+                </video>
+                <div id="subtitle-container">
+                    <p id="subtitle" />
+                </div>
+            </div>
+        </div>
+        <div id="console-modal" class="modal">
+            <div class="console-modal-wrapper">
+                <div class="console-modal-header">
+                    <div>
+                        <h3 class="console-modal-title">Console Logger</h3>
+                        <div class="modal-error-msg" id="console-export-fail-msg"></div>
+                    </div>
+                    <div class="console-modal-controls">
+                        <button id="console-export-button" class="console-control-button">Export</button>
+                        <button id="console-clear-button" class="console-control-button">Clear</button>
+                    </div>
+                </div>
+                <div class="console-modal-content" id="console-modal-content">
+                    <div class="empty-state">No console messages yet.</div>
+                </div>
+            </div>
+        </div>
+        <div id="emote-wheel" class="wheel">
+            <div class="emote-slot" style="top: 10%; left: 50%" data-id="17">
+                <img src="emote-wheel/Lean Forward.png" />
+            </div>
+            <div class="emote-slot" style="top: 25%; left: 70%" data-id="6">
+                <img src="emote-wheel/Blush.png" />
+            </div>
+            <div class="emote-slot" style="top: 50%; left: 88%" data-id="3">
+                <img src="emote-wheel/Spin.png" />
+            </div>
+            <div class="emote-slot" style="top: 70%; left: 70%" data-id="29">
+                <img src="emote-wheel/Angry.png" />
+            </div>
+            <div class="emote-slot" style="top: 75%; left: 50%" data-id="27">
+                <img src="emote-wheel/Stretch 2.png" />
+            </div>
+            <div class="emote-slot" style="top: 70%; left: 30%" data-id="30">
+                <img src="emote-wheel/Open The Next.png" />
+            </div>
+            <div class="emote-slot" style="top: 50%; left: 15%" data-id="22">
+                <img src="emote-wheel/Ponder.png" />
+            </div>
+            <div class="emote-slot" style="top: 25%; left: 30%" data-id="23">
+                <img src="emote-wheel/Pray.png" />
+            </div>
+        </div>
+        <script src="scripts/modal.js"></script>
+        <script src="scripts/console.js"></script>
+        <script src="scripts/emotewheel.js"></script>
+        <script>
+            const dropdown_key = "lainTSX-dropdown-visible";
+
+            const header = document.getElementById("header-bar");
+            const nav_links = document.getElementById("nav-links-container");
+            const dropdown_btn = document.getElementById("dropdown-button");
+            const game_container = document.getElementById("game-container");
+
+            let menu_visible = true;
+            const saved_menu_visible = localStorage.getItem(dropdown_key);
+            if (saved_menu_visible !== null && saved_menu_visible !== "true") {
+                menu_visible = false;
+            }
+
+            const toggle_menu = () => {
+                if (menu_visible) {
+                    header.style.borderBottom = "1px solid white";
+                    header.style.zIndex = "999";
+
+                    nav_links.style.display = "flex";
+
+                    dropdown_btn.style.rotate = "180deg";
+
+                    game_container.style.top = "53%";
+                } else {
+                    header.style.borderBottom = "none";
+                    header.style.zIndex = "-1";
+
+                    nav_links.style.display = "none";
+
+                    dropdown_btn.style.rotate = "unset";
+
+                    game_container.style.top = "50%";
+                }
+            };
+
+            toggle_menu();
+
+            dropdown_btn.addEventListener("click", () => {
+                menu_visible = !menu_visible;
+                localStorage.setItem(dropdown_key, menu_visible);
+
+                toggle_menu();
+            });
+        </script>
+    </body>
+</html>
