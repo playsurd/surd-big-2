@@ -105,6 +105,16 @@
     } };
   }
 })();
+if (typeof window !== 'undefined') {
+  if (typeof window.environmentData === 'undefined') window.environmentData = 'NO_DATA';
+  if (typeof window.nowFullAdOpen === 'undefined') window.nowFullAdOpen = false;
+}
+try {
+  var parentWin = window.parent;
+  if (parentWin && parentWin !== window) {
+    if (typeof parentWin.maeExportApis_ !== 'function') parentWin.maeExportApis_ = function () {};
+  }
+} catch (e) {  }
 if(typeof window.UnityProgress!=="function")window.UnityProgress=function(){this.SetMessage=function(){};this.SetProgress=function(){};this.Clear=function(){};};</script></head><body>
 <div id="unity-container" class="unity-desktop" style="position:absolute;inset:0"><canvas id="unity-canvas" style="width:100vw;height:100vh;display:block"></canvas><div id="loading-cover" style="display:none"></div><div id="unity-loading-bar" style="display:none"><div id="unity-logo"></div><div id="unity-progress-bar-empty"><div id="unity-progress-bar-full"></div></div></div><div id="unity-footer"><div id="unity-webgl-logo"></div><div id="unity-fullscreen-button"></div><div id="unity-build-title"></div></div></div>
 <script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-big-2@main/rocket-goal-io/firebase/firebase.js"></script>
@@ -116,6 +126,6 @@ if(typeof window.UnityProgress!=="function")window.UnityProgress=function(){this
         document.head.appendChild(s);
       }
     </script>
-<script>window.SURD_GAME = {"id":"rocket-goal-io","engine":"unity","base":"https://cdn.jsdelivr.net/gh/playsurd/surd-big-2@main/rocket-goal-io/","runtime":"https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/v4b8615f6da/","files":{"data":{"path":"Build/2e6b9ad94eed2790c664210defe740da.data.unityweb","parts":[".sp0",".sp1"],"bytes":27040816,"mime":"application/octet-stream"},"framework":{"path":"Build/6f314fe54fd9b4f06bc4efe696cc6531.framework.js.unityweb","bytes":722330,"mime":"text/javascript"},"code":{"path":"Build/f0058840c570f9f85a2e5851e27b0f70.wasm.unityweb","parts":[".sp0",".sp1"],"bytes":33559264,"mime":"application/wasm"}},"config":{"era":"modern","loaderJs":"Build/b23dd96997961653e2825455633aac82.loader.js","companyName":"PocketHaven","productName":"RocketGoal","productVersion":"0.3091"}};</script>
-<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/v4b8615f6da/runtime.js"></script>
+<script>window.SURD_GAME = {"id":"rocket-goal-io","engine":"unity","base":"https://cdn.jsdelivr.net/gh/playsurd/surd-big-2@main/rocket-goal-io/","runtime":"https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/vd90635141c/","files":{"data":{"path":"Build/2e6b9ad94eed2790c664210defe740da.data.unityweb","parts":[".sp0",".sp1"],"bytes":27040816,"mime":"application/octet-stream"},"framework":{"path":"Build/6f314fe54fd9b4f06bc4efe696cc6531.framework.js.unityweb","bytes":722330,"mime":"text/javascript"},"code":{"path":"Build/f0058840c570f9f85a2e5851e27b0f70.wasm.unityweb","parts":[".sp0",".sp1"],"bytes":33559264,"mime":"application/wasm"}},"config":{"era":"modern","loaderJs":"Build/b23dd96997961653e2825455633aac82.loader.js","companyName":"PocketHaven","productName":"RocketGoal","productVersion":"0.3091"}};</script>
+<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/vd90635141c/runtime.js"></script>
 </body></html>
