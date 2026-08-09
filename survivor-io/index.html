@@ -105,6 +105,16 @@
     } };
   }
 })();
+if (typeof window !== 'undefined') {
+  if (typeof window.environmentData === 'undefined') window.environmentData = 'NO_DATA';
+  if (typeof window.nowFullAdOpen === 'undefined') window.nowFullAdOpen = false;
+}
+try {
+  var parentWin = window.parent;
+  if (parentWin && parentWin !== window) {
+    if (typeof parentWin.maeExportApis_ !== 'function') parentWin.maeExportApis_ = function () {};
+  }
+} catch (e) {  }
 if(typeof window.UnityProgress!=="function")window.UnityProgress=function(){this.SetMessage=function(){};this.SetProgress=function(){};this.Clear=function(){};};</script></head><body>
 <div id="unity-container" class="unity-desktop" style="position:absolute;inset:0"><canvas id="unity-canvas" style="width:100vw;height:100vh;display:block"></canvas><div id="loading-cover" style="display:none"></div><div id="unity-loading-bar" style="display:none"><div id="unity-logo"></div><div id="unity-progress-bar-empty"><div id="unity-progress-bar-full"></div></div></div><div id="unity-footer"><div id="unity-webgl-logo"></div><div id="unity-fullscreen-button"></div><div id="unity-build-title"></div></div></div>
 
@@ -131,6 +141,6 @@ if(typeof window.UnityProgress!=="function")window.UnityProgress=function(){this
   window.addEventListener('orientationchange', resizeUnityCanvas);
 })();
 </script>
-<script>window.SURD_GAME = {"id":"survivor-io","engine":"unity","base":"https://cdn.jsdelivr.net/gh/playsurd/surd-big-2@main/survivor-io/","runtime":"https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/v4b8615f6da/","files":{"data":{"path":"Build/46b4b31a113ea8dea963ad56252333b5.data.br","parts":[".sp0",".sp1",".sp2"],"bytes":43731053,"mime":"application/octet-stream"},"framework":{"path":"Build/c38019a83ea4c8d041a01438387f1e7e.framework.js","bytes":772850,"mime":"text/javascript"},"code":{"path":"Build/85546b86fc5c6deaf6ce95da9fa3aadd.wasm.br","parts":[".sp0",".sp1",".sp2"],"bytes":48951582,"mime":"application/wasm"}},"config":{"era":"modern","loaderJs":"Build/7a2dbded24d57e056180125b1583e7c4.loader.js","companyName":"madkidgames.com","productName":"Survivor.io","productVersion":"1.0"}};</script>
-<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/v4b8615f6da/runtime.js"></script>
+<script>window.SURD_GAME = {"id":"survivor-io","engine":"unity","base":"https://cdn.jsdelivr.net/gh/playsurd/surd-big-2@main/survivor-io/","runtime":"https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/vd90635141c/","files":{"data":{"path":"Build/46b4b31a113ea8dea963ad56252333b5.data.br","parts":[".sp0",".sp1",".sp2"],"bytes":43731053,"mime":"application/octet-stream"},"framework":{"path":"Build/c38019a83ea4c8d041a01438387f1e7e.framework.js","bytes":772960,"mime":"text/javascript"},"code":{"path":"Build/85546b86fc5c6deaf6ce95da9fa3aadd.wasm.br","parts":[".sp0",".sp1",".sp2"],"bytes":48951582,"mime":"application/wasm"}},"config":{"era":"modern","loaderJs":"Build/7a2dbded24d57e056180125b1583e7c4.loader.js","companyName":"madkidgames.com","productName":"Survivor.io","productVersion":"1.0"}};</script>
+<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/vd90635141c/runtime.js"></script>
 </body></html>
