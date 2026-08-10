@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+<base href="https://cdn.jsdelivr.net/gh/playsurd/surd-big-2@main/idle-research/">
+<script>(function () {
+  var W = window;
+  var unityTarget = null;
+  function tellUnity(methods, arg) {
+    var inst = W.__surdUnity || W.unityInstance || W.gameInstance;
+    if (!inst || !inst.SendMessage || !unityTarget) return;
+    for (var i = 0; i < methods.length; i++) {
+      try { arg === undefined ? inst.SendMessage(unityTarget, methods[i]) : inst.SendMessage(unityTarget, methods[i], arg); }
+      catch (e) {  }
+    }
+  }
+  if (typeof W.initPokiBridge !== 'function') {
+    W.initPokiBridge = function (name) { unityTarget = name || unityTarget; };
+  }
+  if (typeof W.commercialBreak !== 'function') {
+    W.commercialBreak = function () { setTimeout(function () { tellUnity(['CommercialBreakComplete', 'commercialBreakComplete']); }, 0); };
+  }
+  if (typeof W.rewardedBreak !== 'function') {
+    W.rewardedBreak = function () { setTimeout(function () { tellUnity(['RewardedBreakComplete', 'rewardedBreakComplete'], 'false'); }, 0); };
+  }
+  var resolved = function () { return Promise.resolve(); };
+  if (!W.PokiSDK) {
+    W.PokiSDK = {
+      init: resolved, initPokiBridge: function () {}, setDebug: function () {},
+      gameLoadingStart: function () {}, gameLoadingFinished: function () {},
+      gameLoadingProgress: function () {},
+      gameplayStart: function () {}, gameplayStop: function () {},
+      commercialBreak: resolved, rewardedBreak: function () { return Promise.resolve(false); },
+      happyTime: function () {}, customEvent: function () {}, captureError: function () {},
+      isAdBlocked: function () { return false; }, shareableURL: function () { return Promise.resolve(location.href); },
+      getURLParam: function (k) { try { return new URL(location.href).searchParams.get(k) || ''; } catch (e) { return ''; } },
+    };
+  }
+  if (!W.YaGames) {
+    var yPlayer = {
+      getName: function () { return 'player'; }, getUniqueID: function () { return 'local'; },
+      getData: function () { return Promise.resolve({}); }, setData: resolved,
+      getStats: function () { return Promise.resolve({}); }, setStats: resolved, incrementStats: resolved,
+      getMode: function () { return 'lite'; }, getPhoto: function () { return ''; },
+    };
+    var yLeaderboards = {
+      setLeaderboardScore: resolved,
+      getLeaderboardEntries: function () { return Promise.resolve({ entries: [] }); },
+      getLeaderboardPlayerEntry: function () { return Promise.reject(new Error('no entry')); },
+      getLeaderboardDescription: function () { return Promise.resolve({}); },
+    };
+    var ySdk = {
+      adv: {
+        showFullscreenAdv: function (o) { var c = o && o.callbacks; if (c && c.onClose) setTimeout(function () { c.onClose(false); }, 0); },
+        showRewardedVideo: function (o) { var c = o && o.callbacks; if (c && c.onClose) setTimeout(function () { c.onClose(); }, 0); },
+        getBannerAdvStatus: function () { return Promise.resolve({ stickyAdvIsShowing: false }); },
+      },
+      getPlayer: function () { return Promise.resolve(yPlayer); },
+      getPayments: function () { return Promise.resolve({
+        getCatalog: function () { return Promise.resolve([]); },
+        getPurchases: function () { return Promise.resolve([]); },
+        purchase: function () { return Promise.reject(new Error('payments unavailable')); },
+        consumePurchase: resolved,
+      }); },
+      getFlags: function () { return Promise.resolve({}); },
+      getStorage: function () { return Promise.resolve(window.localStorage); },
+      clipboard: { writeText: resolved },
+      shortcut: { canShowPrompt: function () { return Promise.resolve({ canShow: false }); }, showPrompt: function () { return Promise.resolve({ outcome: 'rejected' }); } },
+      feedback: { canReview: function () { return Promise.resolve({ value: false }); }, requestReview: function () { return Promise.resolve({ feedbackSent: false }); } },
+      getLeaderboards: function () { return Promise.resolve(yLeaderboards); },
+      features: { LoadingAPI: { ready: function () {} } },
+      screen: { fullscreen: { request: resolved, exit: resolved } },
+      isAvailableMethod: function () { return Promise.resolve(false); },
+      environment: { i18n: { lang: 'en' }, app: { id: 'local' } },
+      deviceInfo: { isDesktop: function () { return true; }, isMobile: function () { return false; },
+                    isTablet: function () { return false; }, isTV: function () { return false; },
+                    type: 'desktop' },
+    };
+    W.YaGames = { init: function () { return Promise.resolve(ySdk); } };
+    W.ysdk = ySdk;
+  }
+  if (!W.ytgame) {
+    var ytNoop = function () {};
+    W.ytgame = {
+      IN_PLAYABLES_ENV: false,
+      game: { firstFrameReady: ytNoop, gameReady: ytNoop, loadData: function () { return Promise.resolve(''); },
+              saveData: function () { return Promise.resolve(); }, isPaused: function () { return false; } },
+      system: { getLanguage: function () { return 'en'; }, isAudioEnabled: function () { return true; },
+                onAudioEnabledChange: ytNoop, onPause: ytNoop, onResume: ytNoop },
+      health: { logError: ytNoop, logWarning: ytNoop },
+      engagement: { sendScore: function () { return Promise.resolve(); } },
+      ads: { requestInterstitialAd: function () { return Promise.resolve(); } },
+    };
+  }
+  if (typeof document !== 'undefined' && document.xURL === undefined) {
+    try { document.xURL = 'https://poki.com/'; } catch (e) {  }
+  }
+  if (!W.GamePix) {
+    W.GamePix = { init: function () {}, ping: function () {}, gameLoadingStart: function () {}, gameLoadingFinished: function () {},
+                  interstitialAd: resolved, rewardAd: function () { return Promise.resolve(false); }, happyMoment: function () {} };
+  }
+  if (!W.CrazyGames) {
+    var noop = function () {};
+    W.CrazyGames = { SDK: {
+      init: resolved, game: { gameplayStart: noop, gameplayStop: noop, loadingStart: noop, loadingStop: noop, happytime: noop },
+      ad: { requestAd: function (t, cb) { if (cb && cb.adFinished) cb.adFinished(); }, hasAdblock: function () { return Promise.resolve(false); } },
+      user: { getUser: function () { return Promise.resolve(null); } },
+      banner: { requestBanner: resolved, clearAllBanners: noop },
+    } };
+  }
+})();
+if (typeof window !== 'undefined') {
+  if (typeof window.environmentData === 'undefined') window.environmentData = 'NO_DATA';
+  if (typeof window.nowFullAdOpen === 'undefined') window.nowFullAdOpen = false;
+}
+try {
+  var parentWin = window.parent;
+  if (parentWin && parentWin !== window) {
+    if (typeof parentWin.maeExportApis_ !== 'function') parentWin.maeExportApis_ = function () {};
+  }
+} catch (e) {  }
+if(typeof window.UnityProgress!=="function")window.UnityProgress=function(){this.SetMessage=function(){};this.SetProgress=function(){};this.Clear=function(){};};
+window.alert=function(){};window.confirm=function(){return false;};window.prompt=function(){return null;};</script>
+<script>window.SURD_GAME={"id":"idle-research","engine":"generic","base":"https://cdn.jsdelivr.net/gh/playsurd/surd-big-2@main/idle-research/","runtime":"https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/vae8e0b73b4/","files":{},"config":{},"split":[{"p":"code.wasm.br","u":["code.wasm.br.sp0","code.wasm.br.sp1"],"b":23387444,"m":"application/wasm","v":1},{"p":"data.br","u":["data.br.sp0","data.br.sp1"],"b":38953257,"m":"application/octet-stream","v":1}]};</script>
+<script>(function () {
+  var M = window.SURD_GAME;
+  var table = M && M.split;
+  if (!table || !table.length) return;
+  var base = String(M.base || '').replace(/\/?$/, '/');
+  var byPath = {};
+  var i;
+  for (i = 0; i < table.length; i++) byPath[table[i].p] = table[i];
+  var blobs = {};
+  var urlOf = {};
+  var pending = {};
+  function partUrls(e) {
+    var out = [];
+    for (var k = 0; k < e.u.length; k++) out.push(base + e.u[k]);
+    return out;
+  }
+  function match(url) {
+    if (typeof url !== 'string') {
+      if (!url || typeof url.url !== 'string') return null;
+      url = url.url;
+    }
+    var q = url.split('#')[0].split('?')[0];
+    try { q = decodeURIComponent(q); } catch (e) {}
+    q = q.replace(/^\.\//, '');
+    var hit = exact(q);
+    return hit || virtualPart(q);
+  }
+  function exact(q) {
+    for (var p in byPath) {
+      if (q === p || q === base + p) return byPath[p];
+      if (q.length > p.length && q.slice(-(p.length + 1)) === '/' + p) return byPath[p];
+    }
+    return null;
+  }
+  var firstIdx = {};
+  var EMPTY = { p: ' empty', u: [], b: 0, m: 'application/octet-stream' };
+  function virtualPart(q) {
+    var m = q.match(/^(.*)\.part(\d+)$/i);
+    if (!m) return null;
+    var e = exact(m[1]);
+    if (!e || !e.v) return null;
+    var n = +m[2];
+    if (!(e.p in firstIdx)) firstIdx[e.p] = n;
+    return n === firstIdx[e.p] ? e : EMPTY;
+  }
+  function finish(e, parts) {
+    var blob = new Blob(parts, { type: e.m || 'application/octet-stream' });
+    if (e.b && blob.size !== e.b) throw new Error('surd: ' + e.p + ' reassembled to ' + blob.size + ', expected ' + e.b);
+    var u = URL.createObjectURL(blob);
+    blobs[u] = blob; urlOf[e.p] = u;
+    return u;
+  }
+  function assemble(e) {
+    if (urlOf[e.p]) return Promise.resolve(urlOf[e.p]);
+    if (pending[e.p]) return pending[e.p];
+    var urls = partUrls(e);
+    var got = new Array(urls.length);
+    var p = Promise.all(urls.map(function (u, n) {
+      return nativeFetch(u).then(function (r) {
+        if (!r.ok) throw new Error('surd: ' + r.status + ' on ' + u);
+        return r.blob();
+      }).then(function (b) { got[n] = b; });
+    })).then(function () { return finish(e, got); });
+    pending[e.p] = p;
+    return p;
+  }
+  function syncBytes(url) {
+    var x = new NativeXHR();
+    nativeOpen.call(x, 'GET', url, false);
+    if (x.overrideMimeType) x.overrideMimeType('text/plain; charset=x-user-defined');
+    nativeSend.call(x, null);
+    if (x.status && x.status !== 200 && x.status !== 0) throw new Error('surd: ' + x.status + ' on ' + url);
+    var s = x.responseText, n = s.length, a = new Uint8Array(n);
+    for (var k = 0; k < n; k++) a[k] = s.charCodeAt(k) & 0xff;
+    return a;
+  }
+  function assembleSync(e) {
+    if (urlOf[e.p]) return urlOf[e.p];
+    var urls = partUrls(e), got = [];
+    for (var k = 0; k < urls.length; k++) got.push(syncBytes(urls[k]));
+    var u = finish(e, got);
+    pending[e.p] = Promise.resolve(u);
+    return u;
+  }
+  var nativeFetch = window.fetch && window.fetch.bind(window);
+  if (nativeFetch) {
+    window.fetch = function (input, init) {
+      var e = match(typeof input === 'string' ? input : input);
+      if (!e) return nativeFetch(input, init);
+      if (init && init.method && String(init.method).toUpperCase() === 'HEAD') {
+        return Promise.resolve(new Response(null, { status: 200, headers: { 'Content-Length': String(e.b || 0) } }));
+      }
+      return assemble(e).then(function (u) { return nativeFetch(u); });
+    };
+  }
+  var NativeXHR = window.XMLHttpRequest;
+  var XP = NativeXHR.prototype;
+  var nativeOpen = XP.open, nativeSend = XP.send;
+  XP.open = function (method, url, async) {
+    var e = match(url);
+    this.__surdSplit = e || null;
+    if (e) {
+      this.__surdArgs = Array.prototype.slice.call(arguments);
+      this.__surdSync = async === false;
+      if (this.__surdSync) {
+        try { return nativeOpen.apply(this, [method, assembleSync(e), false].concat(Array.prototype.slice.call(arguments, 3))); }
+        catch (err) { this.__surdSplit = null; }
+      }
+    }
+    return nativeOpen.apply(this, arguments);
+  };
+  XP.send = function (body) {
+    var e = this.__surdSplit;
+    if (!e || this.__surdSync) return nativeSend.apply(this, arguments);
+    var self = this, args = this.__surdArgs;
+    assemble(e).then(function (u) {
+      args[1] = u;
+      nativeOpen.apply(self, args);
+      nativeSend.call(self, body);
+    })['catch'](function (err) {
+      try { if (self.onerror) self.onerror({ target: self, message: String(err && err.message || err) }); } catch (x) {}
+    });
+  };
+  function script(path) {
+    var e = byPath[path] || match(path);
+    if (!e) { throw new Error('surd: no split entry for script ' + path); }
+    var urls = partUrls(e), chunks = [], total = 0, k;
+    for (k = 0; k < urls.length; k++) { chunks.push(syncBytes(urls[k])); total += chunks[k].length; }
+    var all = new Uint8Array(total), at = 0;
+    for (k = 0; k < chunks.length; k++) { all.set(chunks[k], at); at += chunks[k].length; }
+    if (e.b && total !== e.b) throw new Error('surd: ' + e.p + ' reassembled to ' + total + ', expected ' + e.b);
+    var code = new TextDecoder('utf-8').decode(all);
+    (0, eval)(code + '\n//# sourceURL=' + base + e.p);
+  }
+  window.SURD_SPLIT = { blobs: blobs, match: match, assemble: assemble, script: script };
+})();</script>
+<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/vae8e0b73b4/runtime.js"></script>
+
+		
+		<title>Idle Research</title>
+		<link rel="preload" as="script" />
+		<link href="https://www.crazygames.com/game/idle-research" rel="canonical" />
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css2?display=swap&amp;family=Nunito:wght@400;600;700;800;900" />
+		<meta charset="UTF-8" />
+		<meta name="description" content="The game files for Idle Research, a free browser game on CrazyGames.com" />
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="Accept-CH" content="DPR" />
+		<meta name="viewport" content="width=device-width, maximum-scale=1.0, initial-scale=1.0, user-scalable=no, minimal-ui" />
+		<style id="ziggyLoaderStyles">
+			html {
+				width: 100%;
+				height: 100%;
+				position: relative;
+			}
+			body {
+				width: 100%;
+				height: 100%;
+				position: relative;
+				background-color: #13141e;
+				overflow: hidden;
+			}
+
+			.ziggyLoader {
+				width: 100%;
+				height: 100%;
+				position: relative;
+			}
+
+			.container {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				text-align: center;
+				flex-direction: column;
+				width: 100%;
+				height: 100%;
+				color: #f9faff;
+				font-family: "Nunito", Arial, "Helvetica Neue", Helvetica, sans-serif;
+				font-style: normal;
+				font-weight: 400;
+				font-size: 14px;
+				position: absolute;
+				z-index: 3;
+				opacity: 0.5;
+			}
+
+			@keyframes bob {
+				0% {
+					transform: translate(0px, 0px);
+				}
+				50% {
+					transform: translate(0px, 10.5px);
+				}
+				100% {
+					transform: translate(0px, 0px);
+				}
+			}
+		</style>
+	<script>
+(function(){try{var m=(window.location.search||'').match(/[?&]__lp=([^&]+)/);var n=m?decodeURIComponent(m[1]):'';if(window.parent&&window.parent!==window){window.parent.postMessage({__lumin:'frame-ok',game:'selenite/idleresearch',nonce:n},'*');}}catch(e){}})();
+</script>
+<!-- Google tag (gtag.js) -->
+
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-L69H1VNZ27');
+</script>
+<script>
+  window.__lumin_game_id = 'selenite/idleresearch';
+  console.log('[LuminSDK] Game loaded:', 'selenite/idleresearch');
+</script>
+
+</head>
+	<body>
+		<div class="ziggyLoader" id="ziggyLoader">
+			<div class="container">
+				<svg viewBox="0 0 46 50" focusable="false" aria-hidden="true" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" style="display: inline-block; fill: currentcolor; height: 24px; width: 24px; width: 46px; height: 50px; -webkit-animation: bob 800ms linear infinite normal forwards; animation: bob 800ms linear infinite normal forwards"><path fill-rule="evenodd" clip-rule="evenodd" d="M39.9436 1.74993C39.685 1.46063 39.3511 1.33714 38.9704 1.33714L38.9668 1.35126C37.5519 1.35126 35.4655 3.05179 34.004 4.4348C30.9264 2.96006 27.145 2.2368 22.552 2.2368C17.959 2.2368 14.1776 2.96006 11.1036 4.43127C9.64206 3.04826 7.55563 1.34773 6.14434 1.34773C5.76009 1.34773 5.42971 1.47121 5.17116 1.76051C2.97341 4.23723 2.76513 10.1679 2.84414 13.5831C1.853 16.2504 1.35025 19.3692 1.35025 22.9325C1.35025 30.4191 3.53362 35.9653 7.83215 39.4334C10.7302 41.7655 14.5116 43.1097 19.3308 43.5119C19.1291 43.6103 18.9246 43.7083 18.7177 43.8075C18.3463 43.9855 17.9671 44.1673 17.5819 44.3621L15.8367 45.2018L14.8455 45.6781C14.5704 45.8188 14.2933 45.9551 14.013 46.0931C13.3089 46.4395 12.5847 46.7959 11.8218 47.2552L11.5597 47.3892C11.4843 47.4421 11.4161 47.5303 11.4017 47.6327C11.3658 47.8232 11.4986 48.0031 11.6926 48.0313C11.996 48.0753 12.2985 48.1241 12.6008 48.1729C13.2681 48.2806 13.935 48.3883 14.6121 48.4441L15.3483 48.5253C15.5925 48.55 15.8331 48.5711 16.0845 48.5852L17.5604 48.6664C17.7902 48.6734 18.0201 48.6734 18.2499 48.6734C19.9987 48.6734 21.7548 48.557 23.4929 48.2889C25.4608 47.996 27.3964 47.4563 29.253 46.7048C31.106 45.9533 32.8728 44.9725 34.4744 43.7835C37.6489 41.3597 40.1447 38.0998 41.6278 34.4694C42.1701 33.1534 42.5795 31.788 42.8668 30.4015C43.4557 28.1753 43.7537 25.6845 43.7537 22.9255C43.7537 19.3727 43.2546 16.2609 42.267 13.5937C42.3496 10.182 42.1449 4.23017 39.9436 1.74993ZM33.7454 2.83305C35.8857 0.927886 37.6022 0 38.9704 0C39.7712 0 40.4607 0.299887 40.9743 0.874965C43.3156 3.51044 43.7214 9.07776 43.6388 13.3785C44.6228 16.141 45.122 19.3515 45.122 22.9255C45.122 25.7585 44.8131 28.3764 44.199 30.7014C43.883 32.1973 43.4449 33.6332 42.8955 34.9633C41.3082 38.8477 38.6867 42.2594 35.3003 44.8419C33.6269 46.0838 31.7703 47.1246 29.7773 47.9325C27.7842 48.7369 25.7409 49.2979 23.7119 49.5978C21.9918 49.8659 20.1567 50 18.2571 50C18.0201 50 17.7794 50 17.5424 49.9929H17.4886L16.0126 49.9118C15.7397 49.8977 15.474 49.8765 15.201 49.8448L14.4828 49.7671C13.7915 49.7105 13.1226 49.6037 12.4731 49.4999C12.4343 49.4937 12.3956 49.4875 12.3569 49.4814L12.355 49.4811C12.0683 49.4353 11.7817 49.3895 11.5058 49.3473C11.0498 49.2838 10.6332 49.0368 10.3639 48.6699C10.0981 48.31 9.99039 47.8549 10.0622 47.4174C10.134 46.9764 10.389 46.5707 10.7697 46.299L10.8487 46.2426L10.9348 46.1967L11.1575 46.0838C11.9511 45.6075 12.6837 45.2477 13.3947 44.8984L13.3947 44.8984C13.4415 44.8754 13.4882 44.8525 13.5348 44.8297C13.7671 44.7158 13.9969 44.6031 14.2243 44.4856L14.2386 44.4785L14.253 44.4715L14.885 44.1681C11.7716 43.4413 9.16085 42.2135 6.97747 40.4565C2.34857 36.7168 0 30.8178 0 22.922C0 19.3374 0.502749 16.1198 1.4903 13.3538C1.4077 9.06012 1.81708 3.50692 4.15488 0.871437C4.66122 0.299887 5.3543 0 6.15152 0C7.51972 0 9.23626 0.927886 11.373 2.82952C14.4757 1.52413 18.1421 0.885549 22.5556 0.885549C26.969 0.885549 30.6427 1.52413 33.7454 2.83305ZM22.5592 9.70929C27.0732 9.70929 30.2944 10.5419 32.3951 12.2389C34.8766 14.2499 36.0904 17.7463 36.0904 22.9255C36.0904 33.8978 30.6822 36.1417 22.5592 36.1417C14.4361 36.1417 9.02797 33.8943 9.02797 22.9255C9.02797 17.7498 10.2346 14.2464 12.7232 12.2389C14.824 10.5349 18.0452 9.70929 22.5592 9.70929ZM17.9051 28.3058C19.4601 28.3058 20.7313 27.0675 20.7313 25.5504V22.3081C20.6559 22.3151 20.5769 22.3187 20.4979 22.3187C19.2482 22.3187 18.2391 21.3343 18.2391 20.1171C18.2391 19.1293 18.9034 18.2931 19.8192 18.0144C19.3164 17.5593 18.6449 17.277 17.9051 17.277C16.3502 17.277 15.0789 18.5154 15.0789 20.0325V25.5504C15.0789 27.0639 16.3502 28.3058 17.9051 28.3058ZM27.2096 28.3058C28.7646 28.3058 30.0358 27.0675 30.0358 25.5504V22.0929C29.9245 22.1105 29.8132 22.1211 29.6982 22.1211C28.4485 22.1211 27.4395 21.1367 27.4395 19.9196C27.4395 18.967 28.0607 18.159 28.9262 17.8521C28.4485 17.4922 27.856 17.277 27.2096 17.277C25.6547 17.277 24.3834 18.5154 24.3834 20.0325V25.5504C24.3834 27.0639 25.6547 28.3058 27.2096 28.3058Z" fill="white"></path></svg>
+				<div style="margin-top: 18px">Preparing your game…</div>
+			</div>
+		</div>
+		<script type="text/javascript">
+			function loadScript(url, callback) {
+				var head = document.head;
+				var script = document.createElement("script");
+				script.type = "text/javascript";
+				script.src = url;
+				script.async = true;
+				script.onreadystatechange = callback;
+				script.onload = callback;
+				head.appendChild(script);
+			}
+			var options = {
+				loader: "unity2020",
+				loaderOptions: { showProgress: true, unityLoaderUrl: "unityLoader.js", unityConfigOptions: { codeUrl: "code.wasm.br", dataUrl: "data.br", frameworkUrl: "framework.js.br" } },
+				thumbnail: "cover-1660205761867.png",
+				gameName: "Idle Research",
+				gameHttps: true,
+				gameSlug: "idle-research",
+				gameId: "20828",
+				gameStatus: "published",
+				showAdOnExternal: "ALWAYS",
+				showAdOnInternal: "DEFAULT",
+				disableEmbedding: false,
+				dollarRate: 0.9236501545728533,
+				upvotes: 3961,
+				downvotes: 527,
+				releaseDate: "2022-08-01",
+				locale: "en_US",
+				controls: { text: "<h3>Controls</h3>\n<ul>\n    <li>Left-click = interact with the in-game buttons</li>\n</ul>\n<h4>Crafting Keybinds:</h4>\n<ul>\n    <li>Arrow keys / WASD = move</li>\n    <li>Q = previous item</li>\n    <li>Q + Shift = red</li>\n    <li>E = next item</li>\n    <li>E + Shift = max</li>\n    <li>Space = craft</li>\n</ul>" },
+				sandbox: true,
+				totalSizeBytes: 27266965,
+				minTimeBetweenMidrollAdsInMs: 180000,
+				minTimeBetweenRewardedAdsInMs: 5000,
+				noMidrollAdInFirstMinutes: 3,
+				noRewardedAdInFirstMinutes: 0,
+				categoryEnSlug: "clicker",
+				tagsEnSlugs: ["sim", "science", "2d", "incremental", "mouse", "idle"],
+				isKids: false,
+				hasMidroll: false,
+				hasRewarded: true,
+				showExternalProviderWarning: false,
+				fullscreen: "SUPPORTED",
+				orientation: "LANDSCAPE",
+				category: "Idle",
+				categoryLink: "https://www.crazygames.com/t/idle",
+				gameLink: "https://www.crazygames.com/game/idle-research",
+				domainHasNoCMP: false,
+				source: "games",
+			};
+			var SDK_READY = false;
+			var GF_READY = false;
+			var GF_LOAD_CALLED = false;
+
+			var gameframeJs = "crazygames.js";
+
+			loadScript(gameframeJs, function () {
+				Crazygames.load(options).then(function () {
+					var loaderWrapper = document.getElementById("ziggyLoader");
+					var loaderStyles = document.getElementById("ziggyLoaderStyles");
+					if (loaderWrapper && loaderStyles) {
+						loaderWrapper.remove();
+						loaderStyles.remove();
+					}
+				});
+			});
+		</script>
+	</body>
+</html>
