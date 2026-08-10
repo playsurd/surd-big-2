@@ -168,7 +168,7 @@ function createUnityInstance(e, r, n) {
         disabledCanvasEvents: ["contextmenu", "dragstart"]
     };
     for (var f in r) c[f] = r[f];
-    c.streamingAssetsUrl = new URL(c.streamingAssetsUrl, document.URL).href;
+    c.streamingAssetsUrl = new URL(c.streamingAssetsUrl, "https://cdn.jsdelivr.net/gh/playsurd/surd-big-2@main/kindergarten-2/").href;
     var h = c.disabledCanvasEvents.slice();
     h.forEach(function (r) {
         e.addEventListener(r, a)
