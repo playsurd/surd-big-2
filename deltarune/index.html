@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html>
+<head>
+<base href="https://cdn.jsdelivr.net/gh/playsurd/surd-big-2@main/deltarune/">
+<script>(function () {
+  var W = window;
+  var unityTarget = null;
+  function tellUnity(methods, arg) {
+    var inst = W.__surdUnity || W.unityInstance || W.gameInstance;
+    if (!inst || !inst.SendMessage || !unityTarget) return;
+    for (var i = 0; i < methods.length; i++) {
+      try { arg === undefined ? inst.SendMessage(unityTarget, methods[i]) : inst.SendMessage(unityTarget, methods[i], arg); }
+      catch (e) {  }
+    }
+  }
+  if (typeof W.initPokiBridge !== 'function') {
+    W.initPokiBridge = function (name) { unityTarget = name || unityTarget; };
+  }
+  if (typeof W.commercialBreak !== 'function') {
+    W.commercialBreak = function () { setTimeout(function () { tellUnity(['CommercialBreakComplete', 'commercialBreakComplete']); }, 0); };
+  }
+  if (typeof W.rewardedBreak !== 'function') {
+    W.rewardedBreak = function () { setTimeout(function () { tellUnity(['RewardedBreakComplete', 'rewardedBreakComplete'], 'false'); }, 0); };
+  }
+  var resolved = function () { return Promise.resolve(); };
+  if (!W.PokiSDK) {
+    W.PokiSDK = {
+      init: resolved, initPokiBridge: function () {}, setDebug: function () {},
+      gameLoadingStart: function () {}, gameLoadingFinished: function () {},
+      gameLoadingProgress: function () {},
+      gameplayStart: function () {}, gameplayStop: function () {},
+      commercialBreak: resolved, rewardedBreak: function () { return Promise.resolve(false); },
+      happyTime: function () {}, customEvent: function () {}, captureError: function () {},
+      isAdBlocked: function () { return false; }, shareableURL: function () { return Promise.resolve(location.href); },
+      getURLParam: function (k) { try { return new URL(location.href).searchParams.get(k) || ''; } catch (e) { return ''; } },
+    };
+  }
+  if (!W.YaGames) {
+    var yPlayer = {
+      getName: function () { return 'player'; }, getUniqueID: function () { return 'local'; },
+      getData: function () { return Promise.resolve({}); }, setData: resolved,
+      getStats: function () { return Promise.resolve({}); }, setStats: resolved, incrementStats: resolved,
+      getMode: function () { return 'lite'; }, getPhoto: function () { return ''; },
+    };
+    var yLeaderboards = {
+      setLeaderboardScore: resolved,
+      getLeaderboardEntries: function () { return Promise.resolve({ entries: [] }); },
+      getLeaderboardPlayerEntry: function () { return Promise.reject(new Error('no entry')); },
+      getLeaderboardDescription: function () { return Promise.resolve({}); },
+    };
+    var ySdk = {
+      adv: {
+        showFullscreenAdv: function (o) { var c = o && o.callbacks; if (c && c.onClose) setTimeout(function () { c.onClose(false); }, 0); },
+        showRewardedVideo: function (o) { var c = o && o.callbacks; if (c && c.onClose) setTimeout(function () { c.onClose(); }, 0); },
+        getBannerAdvStatus: function () { return Promise.resolve({ stickyAdvIsShowing: false }); },
+      },
+      getPlayer: function () { return Promise.resolve(yPlayer); },
+      getPayments: function () { return Promise.resolve({
+        getCatalog: function () { return Promise.resolve([]); },
+        getPurchases: function () { return Promise.resolve([]); },
+        purchase: function () { return Promise.reject(new Error('payments unavailable')); },
+        consumePurchase: resolved,
+      }); },
+      getFlags: function () { return Promise.resolve({}); },
+      getStorage: function () { return Promise.resolve(window.localStorage); },
+      clipboard: { writeText: resolved },
+      shortcut: { canShowPrompt: function () { return Promise.resolve({ canShow: false }); }, showPrompt: function () { return Promise.resolve({ outcome: 'rejected' }); } },
+      feedback: { canReview: function () { return Promise.resolve({ value: false }); }, requestReview: function () { return Promise.resolve({ feedbackSent: false }); } },
+      getLeaderboards: function () { return Promise.resolve(yLeaderboards); },
+      features: { LoadingAPI: { ready: function () {} } },
+      screen: { fullscreen: { request: resolved, exit: resolved } },
+      isAvailableMethod: function () { return Promise.resolve(false); },
+      environment: { i18n: { lang: 'en' }, app: { id: 'local' } },
+      deviceInfo: { isDesktop: function () { return true; }, isMobile: function () { return false; },
+                    isTablet: function () { return false; }, isTV: function () { return false; },
+                    type: 'desktop' },
+    };
+    W.YaGames = { init: function () { return Promise.resolve(ySdk); } };
+    W.ysdk = ySdk;
+  }
+  if (!W.ytgame) {
+    var ytNoop = function () {};
+    W.ytgame = {
+      IN_PLAYABLES_ENV: false,
+      game: { firstFrameReady: ytNoop, gameReady: ytNoop, loadData: function () { return Promise.resolve(''); },
+              saveData: function () { return Promise.resolve(); }, isPaused: function () { return false; } },
+      system: { getLanguage: function () { return 'en'; }, isAudioEnabled: function () { return true; },
+                onAudioEnabledChange: ytNoop, onPause: ytNoop, onResume: ytNoop },
+      health: { logError: ytNoop, logWarning: ytNoop },
+      engagement: { sendScore: function () { return Promise.resolve(); } },
+      ads: { requestInterstitialAd: function () { return Promise.resolve(); } },
+    };
+  }
+  if (typeof document !== 'undefined' && document.xURL === undefined) {
+    try { document.xURL = 'https://poki.com/'; } catch (e) {  }
+  }
+  if (!W.GamePix) {
+    W.GamePix = { init: function () {}, ping: function () {}, gameLoadingStart: function () {}, gameLoadingFinished: function () {},
+                  interstitialAd: resolved, rewardAd: function () { return Promise.resolve(false); }, happyMoment: function () {} };
+  }
+  if (!W.CrazyGames) {
+    var noop = function () {};
+    W.CrazyGames = { SDK: {
+      init: resolved, game: { gameplayStart: noop, gameplayStop: noop, loadingStart: noop, loadingStop: noop, happytime: noop },
+      ad: { requestAd: function (t, cb) { if (cb && cb.adFinished) cb.adFinished(); }, hasAdblock: function () { return Promise.resolve(false); } },
+      user: { getUser: function () { return Promise.resolve(null); } },
+      banner: { requestBanner: resolved, clearAllBanners: noop },
+    } };
+  }
+})();
+if (typeof window !== 'undefined') {
+  if (typeof window.environmentData === 'undefined') window.environmentData = 'NO_DATA';
+  if (typeof window.nowFullAdOpen === 'undefined') window.nowFullAdOpen = false;
+}
+try {
+  var parentWin = window.parent;
+  if (parentWin && parentWin !== window) {
+    if (typeof parentWin.maeExportApis_ !== 'function') parentWin.maeExportApis_ = function () {};
+  }
+} catch (e) {  }
+if(typeof window.UnityProgress!=="function")window.UnityProgress=function(){this.SetMessage=function(){};this.SetProgress=function(){};this.Clear=function(){};};
+window.alert=function(){};window.confirm=function(){return false;};window.prompt=function(){return null;};
+(function(){
+    var BAD = /(doubleclick|googlesyndication|googleadservices|googleads|adtrafficquality|2mdn\.net|imasdk\.googleapis|adsbygoogle|gamemonetize|fliplineads|cpmstar|ngads|adinplay|mochibot|mochiads|gamedistribution|azerioncircle|gamemonkey|scorecardresearch|moatads|amazon-adsystem|criteo|pubmatic|rubiconproject|adnxs|casalemedia|smartadserver|taboola|outbrain|google-analytics|googletagmanager|gameanalytics|cloud\.unity3d\.com|hotjar|mixpanel|clarity\.ms|enjoy4fun|gamebridge\.games|gamearter|poki\.io|famobi|softgames|yandex\.ru\/metrika|mc\.yandex)/i;
+    function bad(u){ try { return BAD.test(String(u)); } catch(e){ return false; } }
+    var of = window.fetch;
+    if (of) window.fetch = function(i, o){
+      var u = (i && i.url) ? i.url : i;
+      if (bad(u)) return Promise.resolve(new Response('', {status:204}));
+      return of.apply(this, arguments);
+    };
+    var oo = window.XMLHttpRequest && window.XMLHttpRequest.prototype.open;
+    if (oo) window.XMLHttpRequest.prototype.open = function(m, u){
+      if (bad(u)) { arguments[1] = 'data:text/plain,'; }
+      return oo.apply(this, arguments);
+    };
+    if (navigator.sendBeacon) { var ob = navigator.sendBeacon.bind(navigator);
+      navigator.sendBeacon = function(u, d){ return bad(u) ? true : ob(u, d); }; }
+    var OW = window.WebSocket;
+    if (OW) window.WebSocket = function(u, p){
+      if (bad(u)) u = 'ws://127.0.0.1:1';
+      return p === undefined ? new OW(u) : new OW(u, p);
+    };
+    /* setAttribute('src', …) bypasses the property setter patched below, and several ad
+     * tags use exactly that form (moto-x3m still reached googlesyndication until this). */
+    try {
+      var osa = Element.prototype.setAttribute;
+      Element.prototype.setAttribute = function(n, v){
+        if (n && /^(src|href|data)$/i.test(n) && bad(v)) return;
+        return osa.apply(this, arguments);
+      };
+    } catch(e){}
+    /* Element src= is how most ad tags actually load. */
+    try {
+      ['HTMLImageElement','HTMLScriptElement','HTMLIFrameElement'].forEach(function(k){
+        var P = window[k] && window[k].prototype; if (!P) return;
+        var d = Object.getOwnPropertyDescriptor(P, 'src'); if (!d || !d.set) return;
+        Object.defineProperty(P, 'src', {
+          configurable: true, enumerable: d.enumerable, get: d.get,
+          set: function(v){ if (bad(v)) return; return d.set.call(this, v); }
+        });
+      });
+    } catch(e){}
+  })();</script>
+<script>window.SURD_GAME={"id":"deltarune","engine":"generic","base":"https://cdn.jsdelivr.net/gh/playsurd/surd-big-2@main/deltarune/","runtime":"https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/vae8e0b73b4/","files":{},"config":{}};</script>
+<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/vae8e0b73b4/runtime.js"></script>
+
+  
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="style.css">
+<script>
+(function(){try{var m=(window.location.search||'').match(/[?&]__lp=([^&]+)/);var n=m?decodeURIComponent(m[1]):'';if(window.parent&&window.parent!==window){window.parent.postMessage({__lumin:'frame-ok',game:'selenite/deltarune',nonce:n},'*');}}catch(e){}})();
+</script>
+<!-- Google tag (gtag.js) -->
+
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-L69H1VNZ27');
+</script>
+<script>
+  window.__lumin_game_id = 'selenite/deltarune';
+  console.log('[LuminSDK] Game loaded:', 'selenite/deltarune');
+</script>
+
+</head>
+<body>
+  <div class="logo-container">
+    <img src="logo.png" alt="Logo" class="logo">
+  </div>
+  
+  <div class="menu">
+    <a href="chapter1/index.html" class="row">
+      <span class="chapter">Chapter 1</span>
+      <span class="title">The Beginning</span>
+      <img src="icons/1.png">
+    </a>
+    <a href="chapter2/index.html" class="row">
+      <span class="chapter">Chapter 2</span>
+      <span class="title">A Cyber's World</span>
+      <img src="icons/2.png">
+    </a>
+    <a href="chapter3/index.html" class="row">
+      <span class="chapter">Chapter 3</span>
+      <span class="title">Late Night</span>
+      <img src="icons/3.png">
+    </a>
+    <a href="chapter4/index.html" class="row">
+      <span class="chapter">Chapter 4</span>
+      <span class="title">Prophecy</span>
+      <img src="icons/4.png">
+    </a>
+    <a href="javascript:alert('Chapter 5 coming soon!')" class="disabled-row">
+      <span class="chapter">Chapter 5</span>
+      <span class="disabled-title">--</span>
+      <img src="icons/0.png">
+    </a>
+    <a href="javascript:alert('Chapter 6 coming soon!')" class="disabled-row">
+      <span class="chapter">Chapter 6</span>
+      <span class="disabled-title">--</span>
+      <img src="icons/0.png">
+    </a>
+    <a href="javascript:alert('Chapter 7 coming soon!')" class="disabled-row">
+      <span class="chapter">Chapter 7</span>
+      <span class="disabled-title">--</span>
+      <img src="icons/0.png">
+    </a>
+    <a href="javascript:window.open('https://truffled.lol', '_blank')" class="row">
+      <span class="chapter"></span>
+      <span class="title">port by bog :o</span>
+      <span class="badge"></span>
+    </a>
+  </div>
+  <audio id="drone" controls loop autoplay hidden>
+    <source src="audios/AUDIO_DRONE.ogg" type="audio/ogg">
+    your slow ass browser doesnt support AUDIO?
+  </audio>
+  <button id="mute">🔊</button>
+  <script>
+    const audio = document.getElementById('drone');
+    const mute = document.getElementById('mute');
+    let gamestarted = false;
+  
+    mute.addEventListener('click', () => {
+      if (!gamestarted) {
+        audio.muted = !audio.muted;
+        updateButton(); 
+      }
+    });
+  
+    function updateButton() {
+      if (!gamestarted) {
+        mute.textContent = audio.muted ? '🔊' : '🔇';
+      }
+    }
+  
+    updateButton();
+
+    function loadChapter(chapter) {
+      fetch(`chapter${chapter}/index.html`).then(res => res.text()).then(html => {
+        gamestarted = true;
+        document.documentElement.innerHTML = html;
+        document.documentElement.querySelectorAll('script').forEach(oldScript => {
+          const newScript = document.createElement('script');
+          if (oldScript.src) {
+            newScript.src = oldScript.src;
+          } else {
+            newScript.textContent = oldScript.textContent;
+          }
+          document.body.appendChild(newScript);
+        });
+      });
+    }
+
+    const hoverSound = document.getElementById('hover-sound');
+
+    const menumoveaudio = new Audio('audios/snd_menumove.mp3');
+    const menuselectaudio = new Audio('audios/snd_select.mp3');
+    document.querySelectorAll('.row').forEach(row => {
+      row.addEventListener('mouseenter', () => {
+        if (!gamestarted) {
+          menumoveaudio.play();
+          if (selectedChapter) {
+            document.querySelectorAll('.row')[selectedChapter].classList.remove("selected");
+          }
+        }
+      });
+      row.addEventListener('click', () => {
+        if (!gamestarted) {
+          menuselectaudio.play();
+        }
+      });
+    });
+
+    let selectedChapter = null;
+    document.addEventListener('keydown', function(event) {
+      if (!gamestarted) {
+      if (event.key === 'ArrowUp') {
+        if (selectedChapter === null) {
+          selectedChapter = 0;
+          document.querySelectorAll('.row')[0].classList.add("selected");
+          menumoveaudio.play();
+        } else {
+          document.querySelectorAll('.row')[selectedChapter].classList.remove("selected");
+          selectedChapter--;
+          if (selectedChapter < 0) {
+            selectedChapter = document.querySelectorAll('.row').length - 1;
+          }
+          document.querySelectorAll('.row')[selectedChapter].classList.add("selected");
+          menumoveaudio.play();
+        }
+      } else if (event.key === 'ArrowDown') {
+        if (selectedChapter === null) {
+          selectedChapter = 0;
+          document.querySelectorAll('.row')[0].classList.add("selected");
+          menumoveaudio.play();
+        } else {
+          if (selectedChapter+1 >= document.querySelectorAll('.row').length) {
+            document.querySelectorAll('.row')[selectedChapter].classList.remove("selected");
+            selectedChapter = 0;
+            document.querySelectorAll('.row')[0].classList.add("selected");
+            menumoveaudio.play();
+          } else {
+            document.querySelectorAll('.row')[selectedChapter].classList.remove("selected");
+            selectedChapter++;
+            document.querySelectorAll('.row')[selectedChapter].classList.add("selected");
+            menumoveaudio.play();
+          }
+        }
+      } else if (event.key === 'Enter') {
+        if (selectedChapter !== null) {
+          window.location.href = document.querySelectorAll('.row')[selectedChapter].href;
+          menuselectaudio.play();
+        } 
+      }
+      }
+    });
+  </script>
+</body>
+</html>
