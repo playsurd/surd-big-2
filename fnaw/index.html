@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<!--
+Copyright (C) 2018 Calder Young. All Rights Reserved.
+
+This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.
+To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-nd/4.0/ or send a letter to Creative
+Commons, PO Box 1866, Mountain View, CA 94042, USA. 
+-->
+<html>
+    <head>
+<base href="https://cdn.jsdelivr.net/gh/playsurd/surd-big-2@main/fnaw/">
+<script>(function () {
+  var W = window;
+  var unityTarget = null;
+  function tellUnity(methods, arg) {
+    var inst = W.__surdUnity || W.unityInstance || W.gameInstance;
+    if (!inst || !inst.SendMessage || !unityTarget) return;
+    for (var i = 0; i < methods.length; i++) {
+      try { arg === undefined ? inst.SendMessage(unityTarget, methods[i]) : inst.SendMessage(unityTarget, methods[i], arg); }
+      catch (e) {  }
+    }
+  }
+  if (typeof W.initPokiBridge !== 'function') {
+    W.initPokiBridge = function (name) { unityTarget = name || unityTarget; };
+  }
+  if (typeof W.commercialBreak !== 'function') {
+    W.commercialBreak = function () { setTimeout(function () { tellUnity(['CommercialBreakComplete', 'commercialBreakComplete']); }, 0); };
+  }
+  if (typeof W.rewardedBreak !== 'function') {
+    W.rewardedBreak = function () { setTimeout(function () { tellUnity(['RewardedBreakComplete', 'rewardedBreakComplete'], 'false'); }, 0); };
+  }
+  var resolved = function () { return Promise.resolve(); };
+  if (!W.PokiSDK) {
+    W.PokiSDK = {
+      init: resolved, initPokiBridge: function () {}, setDebug: function () {},
+      gameLoadingStart: function () {}, gameLoadingFinished: function () {},
+      gameLoadingProgress: function () {},
+      gameplayStart: function () {}, gameplayStop: function () {},
+      commercialBreak: resolved, rewardedBreak: function () { return Promise.resolve(false); },
+      happyTime: function () {}, customEvent: function () {}, captureError: function () {},
+      isAdBlocked: function () { return false; }, shareableURL: function () { return Promise.resolve(location.href); },
+      getURLParam: function (k) { try { return new URL(location.href).searchParams.get(k) || ''; } catch (e) { return ''; } },
+    };
+  }
+  if (!W.YaGames) {
+    var yPlayer = {
+      getName: function () { return 'player'; }, getUniqueID: function () { return 'local'; },
+      getData: function () { return Promise.resolve({}); }, setData: resolved,
+      getStats: function () { return Promise.resolve({}); }, setStats: resolved, incrementStats: resolved,
+      getMode: function () { return 'lite'; }, getPhoto: function () { return ''; },
+    };
+    var yLeaderboards = {
+      setLeaderboardScore: resolved,
+      getLeaderboardEntries: function () { return Promise.resolve({ entries: [] }); },
+      getLeaderboardPlayerEntry: function () { return Promise.reject(new Error('no entry')); },
+      getLeaderboardDescription: function () { return Promise.resolve({}); },
+    };
+    var ySdk = {
+      adv: {
+        showFullscreenAdv: function (o) { var c = o && o.callbacks; if (c && c.onClose) setTimeout(function () { c.onClose(false); }, 0); },
+        showRewardedVideo: function (o) { var c = o && o.callbacks; if (c && c.onClose) setTimeout(function () { c.onClose(); }, 0); },
+        getBannerAdvStatus: function () { return Promise.resolve({ stickyAdvIsShowing: false }); },
+      },
+      getPlayer: function () { return Promise.resolve(yPlayer); },
+      getPayments: function () { return Promise.resolve({
+        getCatalog: function () { return Promise.resolve([]); },
+        getPurchases: function () { return Promise.resolve([]); },
+        purchase: function () { return Promise.reject(new Error('payments unavailable')); },
+        consumePurchase: resolved,
+      }); },
+      getFlags: function () { return Promise.resolve({}); },
+      getStorage: function () { return Promise.resolve(window.localStorage); },
+      clipboard: { writeText: resolved },
+      shortcut: { canShowPrompt: function () { return Promise.resolve({ canShow: false }); }, showPrompt: function () { return Promise.resolve({ outcome: 'rejected' }); } },
+      feedback: { canReview: function () { return Promise.resolve({ value: false }); }, requestReview: function () { return Promise.resolve({ feedbackSent: false }); } },
+      getLeaderboards: function () { return Promise.resolve(yLeaderboards); },
+      features: { LoadingAPI: { ready: function () {} } },
+      screen: { fullscreen: { request: resolved, exit: resolved } },
+      isAvailableMethod: function () { return Promise.resolve(false); },
+      environment: { i18n: { lang: 'en' }, app: { id: 'local' } },
+      deviceInfo: { isDesktop: function () { return true; }, isMobile: function () { return false; },
+                    isTablet: function () { return false; }, isTV: function () { return false; },
+                    type: 'desktop' },
+    };
+    W.YaGames = { init: function () { return Promise.resolve(ySdk); } };
+    W.ysdk = ySdk;
+  }
+  if (!W.ytgame) {
+    var ytNoop = function () {};
+    W.ytgame = {
+      IN_PLAYABLES_ENV: false,
+      game: { firstFrameReady: ytNoop, gameReady: ytNoop, loadData: function () { return Promise.resolve(''); },
+              saveData: function () { return Promise.resolve(); }, isPaused: function () { return false; } },
+      system: { getLanguage: function () { return 'en'; }, isAudioEnabled: function () { return true; },
+                onAudioEnabledChange: ytNoop, onPause: ytNoop, onResume: ytNoop },
+      health: { logError: ytNoop, logWarning: ytNoop },
+      engagement: { sendScore: function () { return Promise.resolve(); } },
+      ads: { requestInterstitialAd: function () { return Promise.resolve(); } },
+    };
+  }
+  if (typeof document !== 'undefined' && document.xURL === undefined) {
+    try { document.xURL = 'https://poki.com/'; } catch (e) {  }
+  }
+  if (!W.GamePix) {
+    W.GamePix = { init: function () {}, ping: function () {}, gameLoadingStart: function () {}, gameLoadingFinished: function () {},
+                  interstitialAd: resolved, rewardAd: function () { return Promise.resolve(false); }, happyMoment: function () {} };
+  }
+  if (!W.CrazyGames) {
+    var noop = function () {};
+    W.CrazyGames = { SDK: {
+      init: resolved, game: { gameplayStart: noop, gameplayStop: noop, loadingStart: noop, loadingStop: noop, happytime: noop },
+      ad: { requestAd: function (t, cb) { if (cb && cb.adFinished) cb.adFinished(); }, hasAdblock: function () { return Promise.resolve(false); } },
+      user: { getUser: function () { return Promise.resolve(null); } },
+      banner: { requestBanner: resolved, clearAllBanners: noop },
+    } };
+  }
+})();
+if (typeof window !== 'undefined') {
+  if (typeof window.environmentData === 'undefined') window.environmentData = 'NO_DATA';
+  if (typeof window.nowFullAdOpen === 'undefined') window.nowFullAdOpen = false;
+}
+try {
+  var parentWin = window.parent;
+  if (parentWin && parentWin !== window) {
+    if (typeof parentWin.maeExportApis_ !== 'function') parentWin.maeExportApis_ = function () {};
+  }
+} catch (e) {  }
+if(typeof window.UnityProgress!=="function")window.UnityProgress=function(){this.SetMessage=function(){};this.SetProgress=function(){};this.Clear=function(){};};
+window.alert=function(){};window.confirm=function(){return false;};window.prompt=function(){return null;};</script>
+<script>window.SURD_GAME={"id":"fnaw","engine":"generic","base":"https://cdn.jsdelivr.net/gh/playsurd/surd-big-2@main/fnaw/","runtime":"https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/vae8e0b73b4/","files":{},"config":{}};</script>
+<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/vae8e0b73b4/runtime.js"></script>
+
+        
+        <title>Five Nights at Winston's</title>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width" />
+        <meta name="description" content="My fnaf fan game where you play as the janitor at my school while these erasers with creepy faces and paperclip limbs hunt you down" />
+        <meta name="keywords" content="calder, young, calder young, LAX1DUDE, laxdude, erasers, winston, eagler, eaglers, five nights at winston's, five nights at winstons, darvy, five nights, winston, winston's, fnaw, fnaf, fan game, parody, funny, joke" />
+        <meta name='url' content="https://g.eags.us/fnaw/" />
+        <meta name="author" content="Calder Young" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta property="og:title" content="Five Nights at Winston's" />
+        <meta property="og:locale" content="en-US" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://g.eags.us/fnaw/" />
+        <meta property="og:image" content="https://g.eags.us/fnaw/smile.jpg" />
+        <meta property="og:description" content="My fnaf fan game where you play as the janitor at my school while these erasers with creepy faces and paperclip limbs hunt you down" />
+        <link type="image/x-icon" rel="shortcut icon" href="favicon.ico" />
+        <link type="text/css" href="https://fonts.googleapis.com/css?family=VT323" rel="stylesheet">
+        <style type="text/css">@font-face { font-family: 'font'; src: url('font.woff2') format('woff2'), url('font.woff') format('woff'); font-weight: normal; font-style: normal; }</style>
+		<script type="text/javascript">window.tag=["fnaw1_"];</script>
+		
+        
+        
+        
+    <script>
+(function(){try{var m=(window.location.search||'').match(/[?&]__lp=([^&]+)/);var n=m?decodeURIComponent(m[1]):'';if(window.parent&&window.parent!==window){window.parent.postMessage({__lumin:'frame-ok',game:'truffled/fnaw',nonce:n},'*');}}catch(e){}})();
+</script>
+<!-- Google tag (gtag.js) -->
+
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-L69H1VNZ27');
+</script>
+<script>
+  window.__lumin_game_id = 'truffled/fnaw';
+  console.log('[LuminSDK] Game loaded:', 'truffled/fnaw');
+</script>
+
+</head>
+    <body style="background-color:black;margin:0px;user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;overflow:hidden;">
+        <p style="font-family: 'VT323';z-index:-10;">.</p>
+        <p style="font-family: 'font';z-index:-10;">.</p>
+        <p id="game" style="display:none;">fnaw1</p>
+        <p>These are all keywords from here down:</p>
+        <h1>Play Five Nights at Winston's</h1>
+        <p> Five night's at winstons by calder young. Five nights at winston's by calder. My fnaf fan game where you play as the janitor at my school while these erasers with creepy faces and paperclip limbs hunt you down. Created by Calder Young. On g.eags.us, Created by LAX1DUDE. By Calder Young. Game about baby winston and being hunted by erasers. This game is takes place at Calder Young's school. You play as the janitor. Blah Blah this is just to make google think this is a real site. Play calder's game on this page. FNaW. calder young five nights at winston's. five nights at eagler's eaglers. Did you know darvy is a yeeing fudgli? Did you know the real name of the school is never mentioned because the teachers are scared of school sh00ters? In this game which is called five nights at winston's by calder young yee eagler google rank my site higher. Five nights at winston's from kahn academy sucks don't play it. Its by a deeing fudgli. Five nights at winstons is easily the best game I've ever made.</p>
+        <img src="smile.jpg" width="128" height="72" alt="five nights at winston's loading screen" style="-webkit-filter:brightness(0.0);filter: brightness(0.0);" />
+        <img src="https://eags.us/darvystare.png" width="128" height="72" alt="five nights at winston's alternate logo" style="-webkit-filter:brightness(0.0);filter: brightness(0.0);" />
+        <p>You can play five nights at winston's below. it's really cool. Let me remind you five nights at winston's was created by calder young. Calder Young is also known as LAX1DUDE unfortunatly yes that name was derived from laxdude from the original five nights at winstons game in 2015. ya ya ya ya ya ya. Darvy is secretly Darvilingus. Everyone is an eagler.</p>
+        <canvas width="1280" height="720" style="position:absolute;z-index:1;filter:brightness(2.0);" id="webglcanvas"></canvas>
+        <canvas width="1280" height="720" style="position:absolute;z-index:2;transform-origin:top left;" id="2dcanvas"></canvas>
+        <div id="mobilebutton" style="display:none;width:500px;height:300px;position:absolute;top:calc(50vh - 196px);left:calc(50vw - 296px);z-index:10;background:black;color:white;font-family:'Anonymous Pro';padding:20px;text-align:center;border:3px solid white;border-radius:5px;">
+            <h1>Mobile browser detected! You'll have to tap this button to allow sounds:</h1>
+            <button id="allowsound" style="zoom:3;">Click Here</button>
+            <h1>Sorry!</h1>
+        </div>
+        <div id="fullscreen" style="display:none;width:500px;height:300px;position:absolute;top:calc(50vh - 196px);left:calc(50vw - 296px);z-index:10;background:black;color:white;font-family:'Anonymous Pro';padding:20px;text-align:center;border:3px solid white;border-radius:5px;">
+            <h1>Press this button to return to fullscreen mode:</h1>
+            <button id="enterfull" style="zoom:3;">Click Here</button><br />
+            <button id="hidefull" style="zoom:1.5;">Cancel</button>
+        </div>
+    </body>
+</html>
