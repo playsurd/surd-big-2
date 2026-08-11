@@ -91,6 +91,24 @@
   if (typeof document !== 'undefined' && document.xURL === undefined) {
     try { document.xURL = 'https://poki.com/'; } catch (e) {  }
   }
+  if (!W.YYGGames) {
+    var yyAds = function (o) {
+      o = o || {};
+      var step = function (fn) { if (typeof fn === 'function') setTimeout(fn, 0); };
+      step(o.beforeShowAd);
+      setTimeout(function () { step(o.afterShowAd); step(o.rewardDismissed); }, 1);
+    };
+    W.YYGGames = {
+      startup: function (o) { if (o && typeof o.complete === 'function') setTimeout(o.complete, 0); },
+      startupByYad: function () {}, showSplash: function () {},
+      showInterstitial: yyAds, showReward: yyAds,
+      canShowReward: function () { return false; },
+      getAdPlatformType: function () { return 'none'; },
+      getForgames: function () { return Promise.resolve([]); },
+      navigate: function () {},
+      onVisibilitychange: function () {},
+    };
+  }
   if (!W.GamePix) {
     W.GamePix = { init: function () {}, ping: function () {}, gameLoadingStart: function () {}, gameLoadingFinished: function () {},
                   interstitialAd: resolved, rewardAd: function () { return Promise.resolve(false); }, happyMoment: function () {} };
@@ -203,6 +221,6 @@ window.alert=function(){};window.confirm=function(){return false;};window.prompt
       setStatusMode('notice');
       initializing = false;
     }</script>
-<script>window.SURD_GAME = {"id":"bart-bash","engine":"godot","base":"https://cdn.jsdelivr.net/gh/playsurd/surd-big-2@main/bart-bash/","runtime":"https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/vae8e0b73b4/","files":{"pck":{"path":"useless/index.pck","parts":[".sp0",".sp1",".sp2",".sp3",".sp4"],"bytes":81342576,"mime":"application/octet-stream"},"wasm":{"path":"useless/index.wasm","parts":[".sp0",".sp1",".sp2"],"bytes":43699192,"mime":"application/wasm"}},"config":{"indexJs":"index.js","godotConfig":{"args":[],"canvasResizePolicy":2,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":81342576,"index.wasm":43699192},"focusCanvas":true,"gdextensionLibs":[]}}};</script>
-<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/vae8e0b73b4/runtime.js"></script>
+<script>window.SURD_GAME = {"id":"bart-bash","engine":"godot","base":"https://cdn.jsdelivr.net/gh/playsurd/surd-big-2@main/bart-bash/","runtime":"https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/va41e0dbc95/","files":{"pck":{"path":"useless/index.pck","parts":[".sp0",".sp1",".sp2",".sp3",".sp4"],"bytes":81342576,"mime":"application/octet-stream"},"wasm":{"path":"useless/index.wasm","parts":[".sp0",".sp1",".sp2"],"bytes":43699192,"mime":"application/wasm"}},"config":{"indexJs":"index.js","godotConfig":{"args":[],"canvasResizePolicy":2,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":81342576,"index.wasm":43699192},"focusCanvas":true,"gdextensionLibs":[]}}};</script>
+<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/va41e0dbc95/runtime.js"></script>
 </body></html>
