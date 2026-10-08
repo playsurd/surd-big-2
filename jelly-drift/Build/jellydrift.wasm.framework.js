@@ -2753,8 +2753,8 @@ var UnityModule = (function () {
       HEAPF64[outHeight >> 3] = canvas ? canvas.clientHeight : 0;
     }
     function _JS_SystemInfo_GetDocumentURL(buffer, bufferSize) {
-      if (buffer) stringToUTF8(document.URL, buffer, bufferSize);
-      return lengthBytesUTF8(document.URL);
+      if (buffer) stringToUTF8("https://cdn.jsdelivr.net/gh/playsurd/surd-big-2@main/jelly-drift/", buffer, bufferSize);
+      return lengthBytesUTF8("https://cdn.jsdelivr.net/gh/playsurd/surd-big-2@main/jelly-drift/");
     }
     function _JS_SystemInfo_GetGPUInfo(buffer, bufferSize) {
       var gpuinfo = UnityLoader.SystemInfo.gpu;
